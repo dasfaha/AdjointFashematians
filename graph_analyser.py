@@ -46,13 +46,14 @@ class TrainingGraph:
             ba = None 
 
         if ab != None and ba != None: 
-            print "Ops! Found a path from A -> B and one from B -> A. This is strange!"
-            return 0.
+            if len(ab) > len(ba):
+                ab = None
+            else:
+                ba = None
 
         if ab != None: 
             print "Found a path of length %i from A -> B" % len(ab)
             return 1./(len(ab))
-
         elif ba != None: 
             print "Found a path of length %i from B -> A" % len(ba)
             return -1./len(ba)
