@@ -64,7 +64,7 @@ def train_matrix(train_matrix):
     cPickle.dump(params, f)
     f.close()
 
-def predict(feature_vector):
+def predict(feature_dict):
         print("loading knn matrix from %s" % KNN_MATRIX_PATH)
         f = open(KNN_MATRIX_PATH, 'r')
         knn_matrix = cPickle.load(f)
@@ -84,16 +84,15 @@ def predict(feature_vector):
         knn_model = pyflann.FLANN()
         knn_model.load_index(KNN_INDEX_PATH, knn_matrix)
 
-        scaled_features = fit_scale_features(feature_vector, scaler_params)
+        features = [feature_dict[k] for k in sorted(feature_dict.keys())]
+        features = map(float, features)
+        scaled_features = fit_scale_features(features, scaler_params)
         scaled_features = np.array(scaled_features, dtype=np.float32)
-
-        print scaled_features
-        print knn_params
 
         indices, dist = knn_model.nn_index(scaled_features,
                                            num_neighbors=4,
                                            checks=knn_params['checks'])
-        return zip(indices, dist)
+        return indices
 
 def run():
     td = TrainingData()
