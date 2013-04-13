@@ -111,6 +111,7 @@ def main():
         for k in neighb_node_attr.keys():
             if not test_node_attr.has_key(k):
                 train_g.td.node_attr_map[test_node][k] = neighb_node_attr[k]
+        train_g.add_graph_influence()
 
     return g, train_g
 

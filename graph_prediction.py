@@ -35,9 +35,11 @@ class GraphPredicter():
         for a, b in self.tg.removed_edges:
             a_attr = self.tg.td.node_attr_map[a]
             b_attr = self.tg.td.node_attr_map[b]
-            if self.predict(a_attr, b_attr) > 0:
-              correct += 1
-            total += 1
+            p = self.predict(a_attr, b_attr)
+            if p != None:
+                if p > 0:
+                  correct += 1
+                total += 1
 
         print "Success ratio %f" % (float(correct)/total) 
 
