@@ -1,7 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from data_reader import TrainingData
-import knn_model
 
 
 class TrainingGraph:
@@ -62,19 +61,38 @@ class TrainingGraph:
         else:
             return None
 
-    def add_graph_influence_to_attr_map(self):
-        for a, b in self.td.edge_attr_map.items():
-            self.td.edge_attr_map[(a, b)]['Graph influence'] = get_influence(a, b)
+    def add_graph_influence(self):
+        for a, b in self.td.edges:
+            self.td.edge_attr_map[(a, b)]['Graph influence'] = self.get_influence(a, b)
 
-    #def add_node_degre_eto_attr_map(self):
-    #    if a, b for self.td.node_attr_map().items():
-    #        self.td.edge_attr_map[(a, b)]['Graph influence'] = get_influence(a, b)
-    # def eigenvector_centrality
+    def add_node_degree(self):
+        in_degrees = self.G.in_degree()
+        out_degrees = self.G.out_degree()
+
+        for i in self.td.node_attr_map.keys():
+            self.td.node_attr_map[i]['Node in-degree'] = in_degrees[i]
+            self.td.node_attr_map[i]['Node out-degree'] = out_degrees[i]
+
+    def add_eigenvector_centrality(self):
+        ec = nx.eigenvector_centrality(self.G)
+
+        for i in self.td.node_attr_map.keys():
+            self.td.node_attr_map[i]['Eigenvector centrality'] = ec[i]
+
+    def add_page_rank(self):
+        pr = nx.pagerank(self.G)
+
+        for i in self.td.node_attr_map.keys():
+            self.td.node_attr_map[i]['Page rank'] = pr[i]
+
              
 if __name__ == "__main__":
     g = TrainingGraph()
     g.print_stats()
-    g.add_graph_influence_to_attr_map()
+    g.add_graph_influence()
+    g.add_node_degree()
+    g.add_eigenvector_centrality()
+    g.add_page_rank()
 
     g.td.write("data/enriched_training.csv")
 
