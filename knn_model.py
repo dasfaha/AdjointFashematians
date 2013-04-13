@@ -4,7 +4,7 @@ import pyflann
 import cPickle
 import math
 
-from data_reader import read_training_data
+from data_reader import TrainingData
 
 import numpy as np
 
@@ -49,9 +49,7 @@ def train_matrix(train_matrix):
     params = flann.build_index(train_matrix,
                                target_precision = 0.95,
                                log_level = 'info',
-                               algorithm = 'composite',
-                               branching = 32,
-                               iterations = 16)
+                               algorithm = 'autotuned')
 
     print('saving knn index to %s' % KNN_INDEX_PATH)
     flann.save_index(KNN_INDEX_PATH)
@@ -98,6 +96,11 @@ def predict(feature_vector):
         return zip(indices, dist)
 
 def run():
-    nodes, edges, features = read_training_data()
-    train_matrix(np.array([map(float, f) for f in features.values()], dtype=np.float32))
+    td = TrainingData()
+    td.read("data/train.csv")
+    features = [td.node_attr_map[k] for k in sorted(td.node_attr_map.keys())]
+    ordered_features = []
+    for f in features:
+        ordered_features.append([f[fi] for fi in sorted(f, key=f.get)])
+    train_matrix(np.array([map(float, f) for f in ordered_features], dtype=np.float32))
 
