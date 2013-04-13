@@ -1,21 +1,19 @@
-import csv 
-import networkx as nx
-import matplotlib.pyplot as plt
+import csv
 
 def read_training_data():
     # List of edges
-    edges = [] 
+    edges = []
     # List of notes
     nodes = []
     # Node to attribute dictionary
-    node_attr_map = {} 
+    node_attr_map = {}
 
     with open('data/train.csv', 'rb') as csvfile:
         csvreader = csv.reader(csvfile)
         firstrow = True
         nb_rows = 0
 
-        # Read the csv file and generate the adjacency list 
+        # Read the csv file and generate the adjacency list
         for row in csvreader:
             if firstrow:
                 firstrow = False
@@ -50,7 +48,7 @@ def read_training_data():
 
     def rename_nodes(nodes, edges, node_attr_map):
         ''' Rename the nodes from str -> int '''
-        new_nodes = range(len(nodes)) 
+        new_nodes = range(len(nodes))
         new_edge = [(nodes.index(a), nodes.index(b)) for a, b in edges]
         new_map = {}
         for k, v in node_attr_map.items():
