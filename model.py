@@ -77,6 +77,22 @@ def build_gbm_model(n_estimators=100, learning_rate=0.1, pcomp=80, subsample=1.0
 
     return pipeline
 
+def build_extratrees_model(n_estimators=100, learning_rate=0.1, pcomp=90, with_pca=False):
+    """Build SVM model with basic parameters """
+    clf = sklearn.ensemble.ExtraTreesClassifier(n_estimators=n_estimators,
+                              n_jobs=2, bootstrap=True, criterion='entropy',
+                              random_state=0)
+    pipeline_elements = [('svc', clf)]
+
+    if with_pca:
+       pca = sklearn.decomposition.RandomizedPCA(n_components=pcomp, whiten=False)
+       pipeline_elements.append(('pca', pca))       
+
+    pipeline = sklearn.pipeline.Pipeline(pipeline_elements[::-1])
+
+    return pipeline
+
+
 def make_submission(clf, X_test, file='/tmp/submission.txt'):
     # predict from model
     series = pandas.Series(clf.predict_proba(X_test)[:, 1])
