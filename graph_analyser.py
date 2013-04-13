@@ -1,7 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from data_reader import TrainingData
-import knn_model
 
 
 class TrainingGraph:
@@ -63,8 +62,8 @@ class TrainingGraph:
             return None
 
     def add_graph_influence(self):
-        for a, b in self.td.edge_attr_map.items():
-            self.td.edge_attr_map[(a, b)]['Graph influence'] = get_influence(a, b)
+        for a, b in self.td.edges:
+            self.td.edge_attr_map[(a, b)]['Graph influence'] = self.get_influence(a, b)
 
     def add_node_degree(self):
         in_degrees = self.G.in_degree()
