@@ -1,4 +1,5 @@
 import csv
+from collections import OrderedDict
 
 def read_training_data(filename='data/train.csv'):
     return TrainingData().read(filename)
@@ -10,8 +11,8 @@ class TrainingData(object):
         self.nodes = nodes or []
         self.edges = edges or []
         # Node to attribute dictionary
-        self.node_attr_map = node_attr_map or {}
-        self.edge_attr_map = edge_attr_map or {}
+        self.node_attr_map = node_attr_map or OrderedDict()
+        self.edge_attr_map = edge_attr_map or OrderedDict()
 
     def read(self, filename):
         with open(filename) as f:
@@ -24,7 +25,7 @@ class TrainingData(object):
             pivot = choice + len(keys_A)
             def insert(row):
                 key = ','.join([str(i) for i in row])
-                self.node_attr_map[key] = dict(zip(keys_A, row))
+                self.node_attr_map[key] = OrderedDict(zip(keys_A, row))
                 return key
             for row in r:
                 key_A = insert(row[choice:pivot])
@@ -33,7 +34,7 @@ class TrainingData(object):
                 # The edge goes from the more to the less influential person
                 key = (key_B, key_A) if choice and row[0] == 1 else (key_A, key_B)
                 self.edges.append(key)
-                self.edge_attr_map[key] = {'Choice': row[0] if choice else None}
+                self.edge_attr_map[key] = OrderedDict({'Choice': row[0] if choice else None})
         return self.rename_nodes()
 
     def write(self, filename):
@@ -56,10 +57,10 @@ class TrainingData(object):
     def rename_nodes(self):
         ''' Rename the dictionary keys from str -> int '''
         # Map the dictionary keys to ints
-        str2int = dict((k, i) for i, k in enumerate(self.node_attr_map.keys()))
+        str2int = OrderedDict((k, i) for i, k in enumerate(self.node_attr_map.keys()))
         self.nodes = range(len(self.node_attr_map))
         self.edges = [(str2int[a], str2int[b]) for a, b in self.edges]
-        self.node_attr_map = dict((str2int[k], v) for k, v in self.node_attr_map.items())
-        self.edge_attr_map = dict(((str2int[a], str2int[b]), v) for (a, b), v in self.edge_attr_map.items())
+        self.node_attr_map = OrderedDict((str2int[k], v) for k, v in self.node_attr_map.items())
+        self.edge_attr_map = OrderedDict(((str2int[a], str2int[b]), v) for (a, b), v in self.edge_attr_map.items())
 
         return self.nodes, self.edges, self.node_attr_map
