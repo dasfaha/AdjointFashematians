@@ -46,11 +46,18 @@ def edges_names_to_ints(nodes, edges):
 edges = edges_names_to_ints(nodes, edges)
 edges = ["%s %s" % (str(a), str(b)) for a, b in edges]
 
-print "Number of duplicates in csv file: %i" % (len(edges) - len(list(set(edges))))
-
 G = nx.parse_edgelist(edges, nodetype = str)
 print "Number of nodes: %i." % len(G.nodes())
 print "Number of edges: %i." % len(G.edges())
+degree = nx.degree(G)
+print "Graph connection: ", nx.connected_components(G)
+
+
+# Write the new enriched csv file 
+with open('data/train_enriched.csv', 'wb') as csvfile:
+     csvwriter = csv.writer(csvfile)
+     spamwriter.writerow(['Spam', 'Lovely Spam', 'Wonderful Spam'])
+
 nx.draw(G)
 nx.draw_graphviz(G)
 nx.write_dot(G,'file.dot')
