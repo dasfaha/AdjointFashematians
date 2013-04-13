@@ -3,8 +3,6 @@ import csv
 def read_training_data():
     # List of edges
     edges = []
-    # List of notes
-    nodes = []
     # Node to attribute dictionary
     node_attr_map = {}
 
@@ -28,9 +26,6 @@ def read_training_data():
             personAstr = str(personA).replace(" ", "")
             personBstr = str(personB).replace(" ", "")
 
-            nodes.append(personAstr)
-            nodes.append(personBstr)
-
             node_attr_map[personAstr] = personA
             node_attr_map[personBstr] = personB
 
@@ -43,19 +38,15 @@ def read_training_data():
             nb_rows += 1
 
 
-    # Make sure that we only have unique nodes
-    nodes = list(set(nodes))
-
-    def rename_nodes(nodes, edges, node_attr_map):
-        ''' Rename the nodes from str -> int '''
-        new_nodes = range(len(nodes))
-        new_edge = [(nodes.index(a), nodes.index(b)) for a, b in edges]
-        new_map = {}
-        for k, v in node_attr_map.items():
-            new_map[nodes.index(k)] = v
+    def rename_nodes(edges, node_attr_map):
+        ''' Rename the dictionary keys from str -> int '''
+        # Map the dictionary keys to ints
+        str2int = dict((k, i) for i, k in enumerate(node_attr_map.keys()))
+        new_nodes = range(len(node_attr_map))
+        new_edge = [(str2int[a], str2int[b]) for a, b in edges]
+        new_map = dict((str2int[k], v) for k, v in node_attr_map.items())
 
         return new_nodes, new_edge, new_map
 
-    nodes, edges, node_attr_map = rename_nodes(nodes, edges, node_attr_map)
-    return nodes, edges, node_attr_map
+    return rename_nodes(edges, node_attr_map)
 
