@@ -46,12 +46,28 @@ def custom_cv_fit(X, y):
         svm = build_svm_model(C=params['C'], gamma=params['gamma'], with_pca=False, # pcomp=params['pca'], with_pca=False,
                               class_weight=params['class_weight'])
         mean_score = sklearn.cross_validation.cross_val_score(svm, X, y,
-                            scoring=sklearn.metrics.SCORERS['roc_auc'], cv=2).mean()
+                            scoring=sklearn.metrics.SCORERS['roc_auc'], cv=4).mean()
 
         print 'Mean score is %0.5f\n' % mean_score
         results[mean_score] = params
 
     return results
+
+def build_gbm_model(n_estimators=100, learning_rate=0.1, pcomp=80, subsample=1.0, with_pca=False):
+    clf = sklearn.ensemble.GradientBoostingClassifier(
+            learning_rate=learning_rate,
+            n_estimators=n_estimators,
+            subsample=subsample)
+
+    pipeline_elements = [('gbm', clf)]
+
+    if with_pca:
+       pca = sklearn.decomposition.RandomizedPCA(n_components=pcomp, whiten=False)
+       pipeline_elements.append(('pca', pca))       
+
+    pipeline = sklearn.pipeline.Pipeline(pipeline_elements[::-1])
+
+    return pipeline
 
 def make_submission(clf, X_test, file='/tmp/submission.txt'):
     # predict from model
