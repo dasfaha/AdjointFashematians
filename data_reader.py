@@ -9,8 +9,8 @@ class TrainingData(object):
         # List of edges
         self.edges = edges or []
         # Node to attribute dictionary
-        self.node_attr_map = node_attr_map{}
-        self.edge_attr_map = edge_attr_map{}
+        self.node_attr_map = node_attr_map or {}
+        self.edge_attr_map = edge_attr_map or {}
 
     def read(self, filename):
         with open(filename) as f:
@@ -20,7 +20,6 @@ class TrainingData(object):
             keys_A = [k[2:] for k in header if k.startswith('A')]
             keys_B = [k[2:] for k in header if k.startswith('B')]
             assert keys_A == keys_B
-            self.keys = keys_A
             pivot = choice + len(keys_A)
             def insert(row):
                 key = ','.join([str(i) for i in row])
@@ -37,6 +36,18 @@ class TrainingData(object):
                     self.edges.append((key_B, key_A))
         return self.rename_nodes()
 
+    def write(self, filename):
+        with open(filename, 'w') as f:
+            # Construct header
+            keys = self.node_attr_map[0].keys()
+            header = ['Choice'] + ['A_' + k for k in keys] + ['B_' + k for k in keys]
+            r = csv.writer(f)
+            r.writerow(header)
+            def extract(key):
+                return self.node_attr_map[key].values()
+            for A, B in self.edges:
+                r.writerow(['0'] + extract(A) + extract(B))
+                r.writerow(['1'] + extract(B) + extract(A))
 
     def rename_nodes(self):
         ''' Rename the dictionary keys from str -> int '''
