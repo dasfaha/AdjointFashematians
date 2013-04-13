@@ -15,7 +15,7 @@ S'info'
 p7
 sS'algorithm'
 p8
-S'autotuned'
+S'composite'
 p9
 sS'build_weight'
 p10
@@ -31,7 +31,7 @@ p13
 I1
 sS'speedup'
 p14
-F5.3592901229858398
+F0
 sS'memory_weight'
 p15
 F0
@@ -43,11 +43,11 @@ p17
 F0.10000000149011612
 sS'iterations'
 p18
-I5
+I16
 sS'random_seed'
 p19
-I834143568
+I882077804
 sS'checks'
 p20
-I9
+I32
 s.

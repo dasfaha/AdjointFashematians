@@ -11,7 +11,7 @@ import numpy as np
 KNN_INDEX_PATH = 'models/knn_index.pk'
 KNN_MATRIX_PATH = 'models/knn_matrix.pk'
 KNN_PARAMS_PATH = 'models/knn_params.pk'
-KNN_SCALER_PARAMS_PATH = 'models/knn_params.pk'
+KNN_SCALER_PARAMS_PATH = 'models/knn_scaler_params.pk'
 
 def scale_features(x):
     params = []
@@ -27,7 +27,7 @@ def scale_features(x):
         x[:,i] = scaled_column
     return params
 
-def fit_scale_features(self, features, scaler_params):
+def fit_scale_features(features, scaler_params):
     for i,f in enumerate(features):
         mean, sd = scaler_params[i]
         if sd == 0:
@@ -49,7 +49,9 @@ def train_matrix(train_matrix):
     params = flann.build_index(train_matrix,
                                target_precision = 0.95,
                                log_level = 'info',
-                               algorithm = 'autotuned')
+                               algorithm = 'composite',
+                               branching = 32,
+                               iterations = 16)
 
     print('saving knn index to %s' % KNN_INDEX_PATH)
     flann.save_index(KNN_INDEX_PATH)
@@ -87,12 +89,15 @@ def predict(feature_vector):
         scaled_features = fit_scale_features(feature_vector, scaler_params)
         scaled_features = np.array(scaled_features, dtype=np.float32)
 
+        print scaled_features
+        print knn_params
+
         indices, dist = knn_model.nn_index(scaled_features,
-                                           num_neightbors=5,
-                                           checks=knn_params)
+                                           num_neighbors=4,
+                                           checks=knn_params['checks'])
         return zip(indices, dist)
 
 def run():
     nodes, edges, features = read_training_data()
-    train_matrix(np.array([map(float, f) for f in features.values()]))
+    train_matrix(np.array([map(float, f) for f in features.values()], dtype=np.float32))
 
