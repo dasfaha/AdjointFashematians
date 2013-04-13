@@ -1,15 +1,17 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import data_reader 
+from data_reader import TrainingData
+import knn_model
 
 
 class TrainingGraph:
     def __init__(self):
-        self.nodes, self.edges, self.node_attr_map = data_reader.read_training_data()
+        self.td = TrainingData()
+        self.td.read("data/train.csv")
 
         self.G = nx.DiGraph()
-        self.G.add_nodes_from(self.nodes)
-        self.G.add_edges_from(self.edges)
+        self.G.add_nodes_from(self.td.nodes)
+        self.G.add_edges_from(self.td.edges)
 
     def print_stats(self):
         print "Number of nodes: %i." % len(self.G.nodes())
@@ -60,7 +62,19 @@ class TrainingGraph:
         else:
             return None
 
+    def add_graph_influence_to_attr_map(self):
+        for a, b in self.td.edge_attr_map.items():
+            self.td.edge_attr_map[(a, b)]['Graph influence'] = get_influence(a, b)
+
+    #def add_node_degre_eto_attr_map(self):
+    #    if a, b for self.td.node_attr_map().items():
+    #        self.td.edge_attr_map[(a, b)]['Graph influence'] = get_influence(a, b)
+    # def eigenvector_centrality
+             
 if __name__ == "__main__":
     g = TrainingGraph()
     g.print_stats()
+    g.add_graph_influence_to_attr_map()
+
+    g.td.write("data/enriched_training.csv")
 
