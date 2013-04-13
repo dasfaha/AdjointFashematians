@@ -31,7 +31,7 @@ def custom_cv_fit(X, y):
     """
 
     tuned_parameters = {
-      'pca': [2, 5, 10, 20],
+      #'pca': [2, 5, 10, 20],
       'C': [1, 10, 100, 1000],
       'gamma': [0.1, 0.01, 0.001, 0.0001],
       'class_weight': ['auto'],
@@ -43,7 +43,7 @@ def custom_cv_fit(X, y):
 
     for params in sklearn.grid_search.IterGrid(tuned_parameters):
         print 'Computing with parameters %s\n' % params
-        svm = build_svm_model(C=params['C'], gamma=params['gamma'], pcomp=params['pca'],
+        svm = build_svm_model(C=params['C'], gamma=params['gamma'], with_pca=False, # pcomp=params['pca'], with_pca=False,
                               class_weight=params['class_weight'])
         mean_score = sklearn.cross_validation.cross_val_score(svm, X, y,
                             scoring=sklearn.metrics.SCORERS['roc_auc'], cv=2).mean()
