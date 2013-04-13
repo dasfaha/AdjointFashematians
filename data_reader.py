@@ -31,10 +31,9 @@ class TrainingData(object):
                 key_B = insert(row[pivot:])
 
                 # The edge goes from the more to the less influential person
-                if choice and row[0] == 0:
-                    self.edges.append((key_A, key_B))
-                else:
-                    self.edges.append((key_B, key_A))
+                key = (key_B, key_A) if choice and row[0] == 1 else (key_A, key_B)
+                self.edges.append(key)
+                self.edge_attr_map[key] = {'Choice': row[0] if choice else None}
         return self.rename_nodes()
 
     def write(self, filename):
@@ -42,16 +41,17 @@ class TrainingData(object):
             # Construct header
             node_keys = self.node_attr_map[0].keys()
             edge_keys = self.edge_attr_map[self.edges[0]].keys()
-            header = ['Choice'] + edge_keys + ['A_' + k for k in node_keys] + ['B_' + k for k in node_keys]
+            header = edge_keys + ['A_' + k for k in node_keys] + ['B_' + k for k in node_keys]
             r = csv.writer(f)
             r.writerow(header)
             def extract_node(key):
                 return self.node_attr_map[key].values()
             def extract_edge(key):
                 return self.edge_attr_map[key].values()
-            for A, B in self.edges:
-                r.writerow(['0'] + extract_edge((A, B)) + extract_node(A) + extract_node(B))
-                r.writerow(['1'] + extract_edge((A, B)) + extract_node(B) + extract_node(A))
+            for key in self.edges:
+                edge = extract_edge(key)
+                A, B = key if edge[0] == 0 else reversed(key)
+                r.writerow(edge + extract_node(A) + extract_node(B))
 
     def rename_nodes(self):
         ''' Rename the dictionary keys from str -> int '''
@@ -60,6 +60,6 @@ class TrainingData(object):
         self.nodes = range(len(self.node_attr_map))
         self.edges = [(str2int[a], str2int[b]) for a, b in self.edges]
         self.node_attr_map = dict((str2int[k], v) for k, v in self.node_attr_map.items())
-        self.edge_attr_map = dict((k, {}) for k in self.edges)
+        self.edge_attr_map = dict(((str2int[a], str2int[b]), v) for (a, b), v in self.edge_attr_map.items())
 
         return self.nodes, self.edges, self.node_attr_map
