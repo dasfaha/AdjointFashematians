@@ -7,9 +7,9 @@ class TrainingGraph:
     def __init__(self):
         self.nodes, self.edges, self.node_attr_map = data_reader.read_training_data()
 
-        # Build a edge list that is compatible with networkx 
-        edgesstr = ["%s %s" % (str(a), str(b)) for a, b in self.edges]
-        self.G = nx.parse_edgelist(edgesstr, nodetype = str)
+        self.G = nx.DiGraph()
+        self.G.add_nodes_from(self.nodes)
+        self.G.add_edges_from(self.edges)
 
     def print_stats(self):
         print "Number of nodes: %i." % len(self.G.nodes())
