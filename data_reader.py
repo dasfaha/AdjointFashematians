@@ -40,15 +40,18 @@ class TrainingData(object):
     def write(self, filename):
         with open(filename, 'w') as f:
             # Construct header
-            keys = self.node_attr_map[0].keys()
-            header = ['Choice'] + ['A_' + k for k in keys] + ['B_' + k for k in keys]
+            node_keys = self.node_attr_map[0].keys()
+            edge_keys = self.edge_attr_map[0].keys()
+            header = ['Choice'] + edge_keys + ['A_' + k for k in node_keys] + ['B_' + k for k in node_keys]
             r = csv.writer(f)
             r.writerow(header)
-            def extract(key):
+            def extract_node(key):
                 return self.node_attr_map[key].values()
+            def extract_edge(key):
+                return self.edge_attr_map[key].values()
             for A, B in self.edges:
-                r.writerow(['0'] + extract(A) + extract(B))
-                r.writerow(['1'] + extract(B) + extract(A))
+                r.writerow(['0'] + extract_edge((A, B)) + extract_node(A) + extract_node(B))
+                r.writerow(['1'] + extract_edge((A, B)) + extract_node(B) + extract_node(A))
 
     def rename_nodes(self):
         ''' Rename the dictionary keys from str -> int '''
