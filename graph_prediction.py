@@ -31,6 +31,7 @@ class GraphPredicter():
     def perform_test(self):
         correct = 0
         total = 0
+        print "Testing %i tests" % len(self.tg.removed_edges)
         for a, b in self.tg.removed_edges:
             a_attr = self.tg.td.node_attr_map[a]
             b_attr = self.tg.td.node_attr_map[b]

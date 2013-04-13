@@ -10,8 +10,8 @@ class TrainingGraph:
         self.td.read(filename)
 
         # remove some if the sample edges for validation purposes
-        self.removed_edges = self.td.edges[:-remove_edges]
-        self.reduced_edges = self.td.edges[-remove_edges:]
+        self.removed_edges = self.td.edges[len(self.td.edges)-remove_edges:]
+        self.reduced_edges = self.td.edges[:len(self.td.edges)-remove_edges]
 
         self.G = nx.DiGraph()
         self.G.add_nodes_from(self.td.nodes)
