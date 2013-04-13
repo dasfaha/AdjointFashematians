@@ -5,11 +5,11 @@ def read_training_data(filename='data/train.csv'):
 
 class TrainingData(object):
 
-    def __init__(self):
+    def __init__(self, edges=None, node_attr_map=None):
         # List of edges
-        self.edges = []
+        self.edges = edges or []
         # Node to attribute dictionary
-        self.node_attr_map = {}
+        self.node_attr_map = node_attr_map{}
 
     def read(self, filename):
         with open(filename) as f:
