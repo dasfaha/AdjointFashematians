@@ -24,6 +24,42 @@ class TrainingGraph:
         nx.draw_graphviz(self.G)
         nx.write_dot(self.G, 'train.dot')
 
+    def get_influence(self, nodea, nodeb):
+        ''' Returns a positive number if "nodea is more dominant than nodeb"; 
+            Returns a negative number if "nodeb is more dominant than nodea";
+            Returns None if no influence comparison could be performed '''
+
+        try:
+            ab = nx.shortest_path(self.G, nodea, nodeb)
+        except nx.NetworkXError:
+            print "Could not find one of the nodes in the graph"
+            return None
+        except nx.NetworkXNoPath:
+            ab = None 
+
+        try:
+            ba = nx.shortest_path(self.G, nodeb, nodea)
+        except nx.NetworkXError:
+            print "Could not find one of the nodes in the graph"
+            return None
+        except nx.NetworkXNoPath:
+            ba = None 
+
+        if ab != None and ba != None: 
+            print "Ops! Found a path from A -> B and one from B -> A. This is strange!"
+            return 0.
+
+        if ab != None: 
+            print "Found a path of length %i from A -> B" % len(ab)
+            return 1./(len(ab))
+
+        elif ba != None: 
+            print "Found a path of length %i from B -> A" % len(ba)
+            return -1./len(ba)
+        else:
+            return None
+
 if __name__ == "__main__":
     g = TrainingGraph()
     g.print_stats()
+
