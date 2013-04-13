@@ -42,7 +42,7 @@ class TrainingData(object):
             # Construct header
             node_keys = self.node_attr_map[0].keys()
             edge_keys = self.edge_attr_map[self.edges[0]].keys()
-            header = edge_keys + ['A_' + k for k in node_keys] + ['B_' + k for k in node_keys]
+            header = [edge_keys[0]] + ['A_' + k for k in node_keys] + ['B_' + k for k in node_keys] + edge_keys[1:]
             r = csv.writer(f)
             r.writerow(header)
             def extract_node(key):
@@ -52,7 +52,7 @@ class TrainingData(object):
             for key in self.edges:
                 edge = extract_edge(key)
                 A, B = key if edge[0] == 0 else reversed(key)
-                r.writerow(edge + extract_node(A) + extract_node(B))
+                r.writerow([edge[0]] + extract_node(A) + extract_node(B) + edge[1:])
 
     def rename_nodes(self):
         ''' Rename the dictionary keys from str -> int '''
