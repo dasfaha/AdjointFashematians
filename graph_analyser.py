@@ -1,16 +1,21 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from data_reader import TrainingData
+import knn_model
 
 
 class TrainingGraph:
-    def __init__(self):
+    def __init__(self, filename="data/train.csv", remove_edges=0):
         self.td = TrainingData()
-        self.td.read("data/train.csv")
+        self.td.read(filename)
+
+        # remove some if the sample edges for validation purposes
+        self.removed_edges = self.td.edges[-remove_edges:]
+        self.reduced_edges = self.td.edges[:-remove_edges]
 
         self.G = nx.DiGraph()
         self.G.add_nodes_from(self.td.nodes)
-        self.G.add_edges_from(self.td.edges)
+        self.G.add_edges_from(self.reduced_edges)
 
     def print_stats(self):
         print "Number of nodes: %i." % len(self.G.nodes())
@@ -53,10 +58,8 @@ class TrainingGraph:
                 ba = None
 
         if ab != None: 
-            print "Found a path of length %i from A -> B" % len(ab)
             return 1./(len(ab))
         elif ba != None: 
-            print "Found a path of length %i from B -> A" % len(ba)
             return -1./len(ba)
         else:
             return None
@@ -86,14 +89,32 @@ class TrainingGraph:
             self.td.node_attr_map[i]['Page rank'] = pr[i]
 
 def main():
-    g = TrainingGraph()
+    # Enrich the training file
+    g = TrainingGraph(filename="data/train.csv")
+
     g.print_stats()
     g.add_graph_influence()
     g.add_node_degree()
     g.add_eigenvector_centrality()
     g.add_page_rank()
-    return g
+
+    # Enrich the test file
+    train_g = TrainingGraph(filename="data/test.csv")
+    for test_node in train_g.td.nodes:
+
+        test_node_attr = train_g.td.node_attr_map[test_node]
+
+        neighb_node = knn_model.predict(test_node_attr)[0][0]
+        neighb_node_attr = g.td.node_attr_map[neighb_node]
+
+        # Enrich the test data 
+        for k in neighb_node_attr.keys():
+            if not test_node_attr.has_key(k):
+                train_g.td.node_attr_map[test_node][k] = neighb_node_attr[k]
+
+    return g, train_g
 
 if __name__ == "__main__":
-    g = main()
+    g, train_g = main()
     g.td.write("data/enriched_training.csv")
+    train_g.td.write("data/enriched_test.csv")
