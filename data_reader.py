@@ -5,8 +5,9 @@ def read_training_data(filename='data/train.csv'):
 
 class TrainingData(object):
 
-    def __init__(self, edges=None, node_attr_map=None, edge_attr_map=None):
+    def __init__(self, nodes=None, edges=None, node_attr_map=None, edge_attr_map=None):
         # List of edges
+        self.nodes = nodes or []
         self.edges = edges or []
         # Node to attribute dictionary
         self.node_attr_map = node_attr_map or {}
