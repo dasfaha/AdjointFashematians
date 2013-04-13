@@ -71,7 +71,7 @@ def build_gbm_model(n_estimators=100, learning_rate=0.1, pcomp=80, subsample=1.0
 
 def make_submission(clf, X_test, file='/tmp/submission.txt'):
     # predict from model
-    series = pandas.Series(clf.predict(X_test))
+    series = pandas.Series(clf.predict_proba(X_test)[:, 1])
     series.astype(int).tofile(file, sep='\n')
 
 

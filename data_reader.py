@@ -36,6 +36,7 @@ def read_training_data():
             node_attr_map[personAstr] = personA
             node_attr_map[personBstr] = personB
 
+            # The edge goes from the more to the less influential person
             if rank == 0:
                 edges.append((personAstr, personBstr))
             else:
