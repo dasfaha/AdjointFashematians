@@ -5,11 +5,12 @@ def read_training_data(filename='data/train.csv'):
 
 class TrainingData(object):
 
-    def __init__(self, edges=None, node_attr_map=None):
+    def __init__(self, edges=None, node_attr_map=None, edge_attr_map=None):
         # List of edges
         self.edges = edges or []
         # Node to attribute dictionary
         self.node_attr_map = node_attr_map{}
+        self.edge_attr_map = edge_attr_map{}
 
     def read(self, filename):
         with open(filename) as f:
@@ -36,12 +37,13 @@ class TrainingData(object):
                     self.edges.append((key_B, key_A))
         return self.rename_nodes()
 
+
     def rename_nodes(self):
         ''' Rename the dictionary keys from str -> int '''
         # Map the dictionary keys to ints
         str2int = dict((k, i) for i, k in enumerate(self.node_attr_map.keys()))
-        new_nodes = range(len(self.node_attr_map))
-        new_edge = [(str2int[a], str2int[b]) for a, b in self.edges]
-        new_map = dict((str2int[k], v) for k, v in self.node_attr_map.items())
+        self.nodes = range(len(self.node_attr_map))
+        self.edges = [(str2int[a], str2int[b]) for a, b in self.edges]
+        self.node_attr_map = dict((str2int[k], v) for k, v in self.node_attr_map.items())
 
-        return new_nodes, new_edge, new_map
+        return self.nodes, self.edges, self.node_attr_map
