@@ -85,14 +85,15 @@ class TrainingGraph:
         for i in self.td.node_attr_map.keys():
             self.td.node_attr_map[i]['Page rank'] = pr[i]
 
-             
-if __name__ == "__main__":
+def main():
     g = TrainingGraph()
     g.print_stats()
     g.add_graph_influence()
     g.add_node_degree()
     g.add_eigenvector_centrality()
     g.add_page_rank()
+    return g
 
+if __name__ == "__main__":
+    g = main()
     g.td.write("data/enriched_training.csv")
-
