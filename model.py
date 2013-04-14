@@ -35,9 +35,9 @@ def custom_cv_fit(X, y):
       #'C': [1, 10, 100, 1000],
       #'gamma': [0.1, 0.01, 0.001, 0.0001],
       #'class_weight': ['auto'],
-      'estimators': [400,100],
-      'subsample': [0.81, 0.82, 0.83, 0.84, 0.80, 0.79],
-      'learning_rate': [0.1,0.2]
+      'estimators': [500, 400, 200],
+      'subsample': [1.0, 0.80, 0.75],
+      'learning_rate': [0.1]
     }
 
     results = {}
