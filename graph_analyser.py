@@ -147,14 +147,15 @@ def main():
     for test_node in train_g.td.nodes:
         
         test_node_attr = train_g.td.node_attr_map[test_node]
-        # Get the nearest neighbour node on the train graph
-        neighb_node = knn_model.predict(test_node_attr)[0][0]
-        neighb_node_attr = g.td.node_attr_map[neighb_node]
+        # Get the nearest neighbour nodes on the train graph
+        neighb_nodes = knn_model.predict(test_node_attr)[0]
+
+        neighb_nodes_attr = [g.td.node_attr_map[neighb_node] for neighb_node in neighb_nodes]
 
         # Enrich the test data 
-        for k in neighb_node_attr.keys():
-            if not test_node_attr.has_key(k):
-                train_g.td.node_attr_map[test_node][k] = neighb_node_attr[k]
+        for k in neighb_nodes_attr[0].keys():
+            if k not in train_g.td.keys:  #test_node_attr.has_key(k):
+                train_g.td.node_attr_map[test_node][k] = float(sum([neighb_nodes_attr[i][k] for i in range(len(neighb_nodes_attr))]))/len(neighb_nodes_attr)
 
 
     return g, train_g
