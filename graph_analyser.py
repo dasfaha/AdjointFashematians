@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from data_reader import TrainingData
 import knn_model
 
-
 class TrainingGraph:
     def __init__(self, filename="data/train.csv", remove_edges=0):
         self.td = TrainingData()
@@ -16,6 +15,10 @@ class TrainingGraph:
         self.G = nx.DiGraph()
         self.G.add_nodes_from(self.td.nodes)
         self.G.add_edges_from(self.reduced_edges)
+
+    def reduce_graph_to_largest_component(self):
+        ''' Reduces the graph to only the largest connected part '''
+        self.G = nx.weakly_connected_component_subgraphs(self.G)[0]
 
     def print_stats(self):
         print "Number of nodes: %i." % len(self.G.nodes())
