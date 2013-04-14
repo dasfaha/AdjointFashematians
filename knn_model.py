@@ -48,7 +48,7 @@ def train_matrix(train_matrix):
     flann = pyflann.FLANN()
     params = flann.build_index(train_matrix,
                                target_precision = 0.95,
-                               log_level = 'debug',
+                               log_level = 'info',
                                algorithm = 'autotuned')
 
     #print('saving knn index to %s' % KNN_INDEX_PATH)
@@ -96,7 +96,6 @@ def predict(feature_dict):
 
 def run():
     tg = TrainingGraph()
-    #tg.reduce_graph_to_largest_component()
     features = [tg.td.node_attr_map[k] for k in sorted(tg.G.nodes())]
     ordered_features = []
     for f in features:
