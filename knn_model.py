@@ -13,6 +13,24 @@ KNN_MATRIX_PATH = 'models/knn_matrix.pk'
 KNN_PARAMS_PATH = 'models/knn_params.pk'
 KNN_SCALER_PARAMS_PATH = 'models/knn_scaler_params.pk'
 
+f = open(KNN_MATRIX_PATH, 'r')
+knn_matrix = cPickle.load(f)
+f.close()
+
+#print("loading knn model params from %s" % KNN_PARAMS_PATH)
+f = open(KNN_PARAMS_PATH, 'r')
+knn_params = cPickle.load(f)
+f.close()
+
+#print("loading knn scaler params from %s" % KNN_SCALER_PARAMS_PATH)
+f = open(KNN_SCALER_PARAMS_PATH, 'r')
+scaler_params = cPickle.load(f)
+f.close()
+
+#print("loading knn index from %s" % KNN_INDEX_PATH)
+knn_model = pyflann.FLANN()
+knn_model.load_index(KNN_INDEX_PATH, knn_matrix)
+
 def scale_features(x):
     params = []
     for i, column in enumerate(x.transpose()):
@@ -65,24 +83,6 @@ def train_matrix(train_matrix):
     f.close()
 
 def predict(feature_dict):
-        #print("loading knn matrix from %s" % KNN_MATRIX_PATH)
-        f = open(KNN_MATRIX_PATH, 'r')
-        knn_matrix = cPickle.load(f)
-        f.close()
-
-        #print("loading knn model params from %s" % KNN_PARAMS_PATH)
-        f = open(KNN_PARAMS_PATH, 'r')
-        knn_params = cPickle.load(f)
-        f.close()
-
-        #print("loading knn scaler params from %s" % KNN_SCALER_PARAMS_PATH)
-        f = open(KNN_SCALER_PARAMS_PATH, 'r')
-        scaler_params = cPickle.load(f)
-        f.close()
-
-        #print("loading knn index from %s" % KNN_INDEX_PATH)
-        knn_model = pyflann.FLANN()
-        knn_model.load_index(KNN_INDEX_PATH, knn_matrix)
 
         features = [feature_dict[k] for k in sorted(feature_dict.keys())]
         features = map(float, features)
