@@ -35,9 +35,9 @@ def custom_cv_fit(X, y):
       #'C': [1, 10, 100, 1000],
       #'gamma': [0.1, 0.01, 0.001, 0.0001],
       #'class_weight': ['auto'],
-      'estimators': [100, 400, 800],
-      'subsample': [1, 0.8, 0.5],
-      'learning_rate': [0.1, 0.5, 1.0]
+      'estimators': [500, 400, 200],
+      'subsample': [1.0, 0.80, 0.75],
+      'learning_rate': [0.1]
     }
 
     results = {}
@@ -61,11 +61,12 @@ def custom_cv_fit(X, y):
 
     return results
 
-def build_gbm_model(n_estimators=100, learning_rate=0.1, pcomp=80, subsample=1.0, with_pca=False):
+def build_gbm_model(n_estimators=100, learning_rate=0.1, pcomp=80, subsample=1.0, loss='deviance', with_pca=False):
     clf = sklearn.ensemble.GradientBoostingClassifier(
             learning_rate=learning_rate,
             n_estimators=n_estimators,
-            subsample=subsample)
+            subsample=subsample,
+            loss=loss)
 
     pipeline_elements = [('gbm', clf)]
 
