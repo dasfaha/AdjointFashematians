@@ -48,7 +48,7 @@ class TrainingData(object):
             # Construct header
             node_keys = [k for k in self.node_attr_map[0].keys() if k not in self.keys]
             edge_keys = self.edge_attr_map[self.edges[0]].keys()
-            header = edge_keys[1:] + ['A_' + k for k in node_keys] + ['B_' + k for k in node_keys]
+            header = edge_keys + ['A_' + k for k in node_keys] + ['B_' + k for k in node_keys]
             r = csv.writer(f)
             r.writerow(header)
             def extract_node(key):
