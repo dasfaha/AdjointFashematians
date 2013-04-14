@@ -15,6 +15,13 @@ class TrainingGraph:
         self.G.add_nodes_from(self.td.nodes)
         self.G.add_edges_from(self.reduced_edges)
 
+    def add_iterative_edges(self):
+        for n in self.G.nodes():
+            for neigh in self.G.neighbors(n):
+                for secondneigh in self.G.neighbors(neigh):
+                    self.G.add_edge(n, secondneigh)
+
+
     def reduce_graph_to_largest_component(self):
         ''' Reduces the graph to only the largest connected part '''
         self.G = nx.weakly_connected_component_subgraphs(self.G)[0]
@@ -98,12 +105,13 @@ class TrainingGraph:
 
     def add_number_of_paths(self):
         for a, b in self.td.edges:
-            self.td.edge_attr_map[(a, b)]['Number of paths'] = len(list(nx.all_simple_paths(self.G, a, b, cutoff=3)))
+            self.td.edge_attr_map[(a, b)]['Number of paths'] = len(list(nx.all_simple_paths(self.G, a, b, cutoff=1)))
 
 def main():
     import knn_model
     # Enrich the training file
     g = TrainingGraph(filename="data/train.csv")
+    g.add_iterative_edges()
 
     g.print_stats()
     print "*** Enriching train data ***"
@@ -140,7 +148,7 @@ def main():
 
         for i in range(len(neighb_a)):
             #avg_graph_influence.append(g.get_influence(neighb_a[i], neighb_b[i]))
-            avg_nb_paths.append(len(list(nx.all_simple_paths(g.G, neighb_a[i], neighb_b[i], cutoff=3))))
+            avg_nb_paths.append(len(list(nx.all_simple_paths(g.G, neighb_a[i], neighb_b[i], cutoff=1))))
 
         #train_g.td.edge_attr_map[(a, b)]['Graph influence'] = float(sum(avg_graph_influence))/len(avg_graph_influence)
         train_g.td.edge_attr_map[(a, b)]['Number of paths'] = float(sum(avg_nb_paths))/len(avg_nb_paths)
