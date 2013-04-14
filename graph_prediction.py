@@ -19,14 +19,14 @@ class GraphPredicter():
 
         for i, d in enumerate(dist):
             if d == mindist:
-                return i
+                return i, mindist
 
     def predict(self, a_attr, b_attr):
-        a = self.find_closest_neighbour(a_attr)
-        b = self.find_closest_neighbour(b_attr)
+        a, dista = self.find_closest_neighbour(a_attr)
+        b, distb = self.find_closest_neighbour(b_attr)
 
         i = self.tg.get_influence(a, b) > 0
-        return i
+        return i, max(dista, distb)
 
     def perform_test(self):
         correct = 0
@@ -35,7 +35,7 @@ class GraphPredicter():
         for a, b in self.tg.removed_edges:
             a_attr = self.tg.td.node_attr_map[a]
             b_attr = self.tg.td.node_attr_map[b]
-            p = self.predict(a_attr, b_attr)
+            p, maxdist = self.predict(a_attr, b_attr)
             if p != None:
                 if p > 0:
                   correct += 1
