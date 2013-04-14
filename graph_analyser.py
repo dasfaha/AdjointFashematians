@@ -110,7 +110,7 @@ def main():
     print "Computing enriched edge data"
     # Edge attributes
     #g.add_graph_influence()
-    #g.add_number_of_paths()
+    g.add_number_of_paths()
     # Handle the enriched node data
     print "Computing enriched node data"
     g.add_node_degree()
@@ -124,7 +124,10 @@ def main():
 
     # Handle the enriched edge data
     print "Computing enriched edge data"
+    ctr = 0 
     for a, b in train_g.td.edges:
+        ctr += 1
+        print "\rComputing path %i/%i." % (ctr, len(train_g.td.edges)),
         # Get the two neighbour nodes on the training graph
         test_a_attr = train_g.td.node_attr_map[a]
         neighb_a = knn_model.predict(test_a_attr)[0]
@@ -132,29 +135,30 @@ def main():
         test_b_attr = train_g.td.node_attr_map[b]
         neighb_b = knn_model.predict(test_b_attr)[0]
 
-        #avg_nb_paths = [] 
+        avg_nb_paths = [] 
         #avg_graph_influence = [] 
 
-        #for i in range(len(neighb_a)):
+        for i in range(len(neighb_a)):
             #avg_graph_influence.append(g.get_influence(neighb_a[i], neighb_b[i]))
-            #avg_nb_paths.append(len(list(nx.all_simple_paths(g.G, neighb_a[i], neighb_b[i], cutoff=2))))
+            avg_nb_paths.append(len(list(nx.all_simple_paths(g.G, neighb_a[i], neighb_b[i], cutoff=2))))
 
         #train_g.td.edge_attr_map[(a, b)]['Graph influence'] = float(sum(avg_graph_influence))/len(avg_graph_influence)
-        #train_g.td.edge_attr_map[(a, b)]['Number of paths'] = float(sum(avg_nb_paths))/len(avg_nb_paths)
+        train_g.td.edge_attr_map[(a, b)]['Number of paths'] = float(sum(avg_nb_paths))/len(avg_nb_paths)
 
     # Handle the enriched node data
-    print "Computing enriched node data"
+    print "\nComputing enriched node data"
     for test_node in train_g.td.nodes:
         
         test_node_attr = train_g.td.node_attr_map[test_node]
-        # Get the nearest neighbour node on the train graph
-        neighb_node = knn_model.predict(test_node_attr)[0][0]
-        neighb_node_attr = g.td.node_attr_map[neighb_node]
+        # Get the nearest neighbour nodes on the train graph
+        neighb_nodes = knn_model.predict(test_node_attr)[0]
+
+        neighb_nodes_attr = [g.td.node_attr_map[neighb_node] for neighb_node in neighb_nodes]
 
         # Enrich the test data 
-        for k in neighb_node_attr.keys():
-            if not test_node_attr.has_key(k):
-                train_g.td.node_attr_map[test_node][k] = neighb_node_attr[k]
+        for k in neighb_nodes_attr[0].keys():
+            if k not in train_g.td.keys: 
+                train_g.td.node_attr_map[test_node][k] = float(sum([neighb_nodes_attr[i][k] for i in range(len(neighb_nodes_attr))]))/len(neighb_nodes_attr)
 
 
     return g, train_g
