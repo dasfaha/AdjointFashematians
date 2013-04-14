@@ -90,21 +90,16 @@ def predict(feature_dict):
         scaled_features = np.array(scaled_features, dtype=np.float32)
 
         indices, dist = knn_model.nn_index(scaled_features,
-                                           num_neighbors=4,
+                                           num_neighbors=10,
                                            checks=knn_params['checks'])
         return indices
 
 def run():
     tg = TrainingGraph()
-    tg.reduce_graph_to_largest_component()
-
-    print len(tg.G.nodes())
-
+    #tg.reduce_graph_to_largest_component()
     features = [tg.td.node_attr_map[k] for k in sorted(tg.G.nodes())]
-
     ordered_features = []
     for f in features:
         ordered_features.append([f[fi] for fi in sorted(f, key=f.get)])
-
     train_matrix(np.array([map(float, f) for f in ordered_features], dtype=np.float32))
 
