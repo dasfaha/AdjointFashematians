@@ -98,7 +98,7 @@ class TrainingGraph:
 
     def add_number_of_paths(self):
         for a, b in self.td.edges:
-            self.td.edge_attr_map[(a, b)]['Number of paths'] = len(list(nx.all_simple_paths(self.G, a, b, cutoff=2)))
+            self.td.edge_attr_map[(a, b)]['Number of paths'] = len(list(nx.all_simple_paths(self.G, a, b, cutoff=3)))
 
 def main():
     import knn_model
@@ -140,7 +140,7 @@ def main():
 
         for i in range(len(neighb_a)):
             #avg_graph_influence.append(g.get_influence(neighb_a[i], neighb_b[i]))
-            avg_nb_paths.append(len(list(nx.all_simple_paths(g.G, neighb_a[i], neighb_b[i], cutoff=2))))
+            avg_nb_paths.append(len(list(nx.all_simple_paths(g.G, neighb_a[i], neighb_b[i], cutoff=3))))
 
         #train_g.td.edge_attr_map[(a, b)]['Graph influence'] = float(sum(avg_graph_influence))/len(avg_graph_influence)
         train_g.td.edge_attr_map[(a, b)]['Number of paths'] = float(sum(avg_nb_paths))/len(avg_nb_paths)
