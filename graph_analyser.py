@@ -1,7 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from data_reader import TrainingData
-import knn_model
 
 class TrainingGraph:
     def __init__(self, filename="data/train.csv", remove_edges=0):
@@ -92,6 +91,7 @@ class TrainingGraph:
             self.td.node_attr_map[i]['Page rank'] = pr[i]
 
 def main():
+    import knn_model
     # Enrich the training file
     g = TrainingGraph(filename="data/train.csv")
 
