@@ -41,7 +41,7 @@ class TrainingGraph:
             ab = nx.shortest_path(self.G, nodea, nodeb)
         except nx.NetworkXError:
             print "Could not find one of the nodes in the graph"
-            return None
+            return 0.0
         except nx.NetworkXNoPath:
             ab = None 
 
@@ -49,7 +49,7 @@ class TrainingGraph:
             ba = nx.shortest_path(self.G, nodeb, nodea)
         except nx.NetworkXError:
             print "Could not find one of the nodes in the graph"
-            return None
+            return 0.0
         except nx.NetworkXNoPath:
             ba = None 
 
@@ -64,7 +64,7 @@ class TrainingGraph:
         elif ba != None: 
             return -1./len(ba)
         else:
-            return None
+            return 0.0
 
     def add_graph_influence(self):
         for a, b in self.td.edges:
@@ -90,23 +90,64 @@ class TrainingGraph:
         for i in self.td.node_attr_map.keys():
             self.td.node_attr_map[i]['Page rank'] = pr[i]
 
+    def add_hits(self):
+        hits = nx.hits(self.G)[0]
+
+        for i in self.td.node_attr_map.keys():
+            self.td.node_attr_map[i]['HITS'] = hits[i]
+
+    def add_number_of_paths(self):
+        for a, b in self.td.edges:
+            self.td.edge_attr_map[(a, b)]['Number of paths'] = len(list(nx.all_simple_paths(self.G, a, b, cutoff=2)))
+
 def main():
     import knn_model
     # Enrich the training file
     g = TrainingGraph(filename="data/train.csv")
 
     g.print_stats()
-    g.add_graph_influence()
+    print "*** Enriching train data ***"
+    print "Computing enriched edge data"
+    # Edge attributes
+    #g.add_graph_influence()
+    #g.add_number_of_paths()
+    # Handle the enriched node data
+    print "Computing enriched node data"
     g.add_node_degree()
     g.add_eigenvector_centrality()
     g.add_page_rank()
+    g.add_hits()
 
     # Enrich the test file
+    print "*** Enriching test data ***"
     train_g = TrainingGraph(filename="data/test.csv")
+
+    # Handle the enriched edge data
+    print "Computing enriched edge data"
+    for a, b in train_g.td.edges:
+        # Get the two neighbour nodes on the training graph
+        test_a_attr = train_g.td.node_attr_map[a]
+        neighb_a = knn_model.predict(test_a_attr)[0]
+
+        test_b_attr = train_g.td.node_attr_map[b]
+        neighb_b = knn_model.predict(test_b_attr)[0]
+
+        #avg_nb_paths = [] 
+        #avg_graph_influence = [] 
+
+        #for i in range(len(neighb_a)):
+            #avg_graph_influence.append(g.get_influence(neighb_a[i], neighb_b[i]))
+            #avg_nb_paths.append(len(list(nx.all_simple_paths(g.G, neighb_a[i], neighb_b[i], cutoff=2))))
+
+        #train_g.td.edge_attr_map[(a, b)]['Graph influence'] = float(sum(avg_graph_influence))/len(avg_graph_influence)
+        #train_g.td.edge_attr_map[(a, b)]['Number of paths'] = float(sum(avg_nb_paths))/len(avg_nb_paths)
+
+    # Handle the enriched node data
+    print "Computing enriched node data"
     for test_node in train_g.td.nodes:
-
+        
         test_node_attr = train_g.td.node_attr_map[test_node]
-
+        # Get the nearest neighbour node on the train graph
         neighb_node = knn_model.predict(test_node_attr)[0][0]
         neighb_node_attr = g.td.node_attr_map[neighb_node]
 
@@ -114,7 +155,7 @@ def main():
         for k in neighb_node_attr.keys():
             if not test_node_attr.has_key(k):
                 train_g.td.node_attr_map[test_node][k] = neighb_node_attr[k]
-        train_g.add_graph_influence()
+
 
     return g, train_g
 
