@@ -4,7 +4,7 @@ import pyflann
 import cPickle
 import math
 
-from data_reader import TrainingData
+from graph_analyser import TrainingGraph
 
 import numpy as np
 
@@ -12,6 +12,24 @@ KNN_INDEX_PATH = 'models/knn_index.pk'
 KNN_MATRIX_PATH = 'models/knn_matrix.pk'
 KNN_PARAMS_PATH = 'models/knn_params.pk'
 KNN_SCALER_PARAMS_PATH = 'models/knn_scaler_params.pk'
+
+f = open(KNN_MATRIX_PATH, 'r')
+knn_matrix = cPickle.load(f)
+f.close()
+
+#print("loading knn model params from %s" % KNN_PARAMS_PATH)
+f = open(KNN_PARAMS_PATH, 'r')
+knn_params = cPickle.load(f)
+f.close()
+
+#print("loading knn scaler params from %s" % KNN_SCALER_PARAMS_PATH)
+f = open(KNN_SCALER_PARAMS_PATH, 'r')
+scaler_params = cPickle.load(f)
+f.close()
+
+#print("loading knn index from %s" % KNN_INDEX_PATH)
+knn_model = pyflann.FLANN()
+knn_model.load_index(KNN_INDEX_PATH, knn_matrix)
 
 def scale_features(x):
     params = []
@@ -65,24 +83,6 @@ def train_matrix(train_matrix):
     f.close()
 
 def predict(feature_dict):
-        #print("loading knn matrix from %s" % KNN_MATRIX_PATH)
-        f = open(KNN_MATRIX_PATH, 'r')
-        knn_matrix = cPickle.load(f)
-        f.close()
-
-        #print("loading knn model params from %s" % KNN_PARAMS_PATH)
-        f = open(KNN_PARAMS_PATH, 'r')
-        knn_params = cPickle.load(f)
-        f.close()
-
-        #print("loading knn scaler params from %s" % KNN_SCALER_PARAMS_PATH)
-        f = open(KNN_SCALER_PARAMS_PATH, 'r')
-        scaler_params = cPickle.load(f)
-        f.close()
-
-        #print("loading knn index from %s" % KNN_INDEX_PATH)
-        knn_model = pyflann.FLANN()
-        knn_model.load_index(KNN_INDEX_PATH, knn_matrix)
 
         features = [feature_dict[k] for k in sorted(feature_dict.keys())]
         features = map(float, features)
@@ -90,14 +90,13 @@ def predict(feature_dict):
         scaled_features = np.array(scaled_features, dtype=np.float32)
 
         indices, dist = knn_model.nn_index(scaled_features,
-                                           num_neighbors=4,
+                                           num_neighbors=10,
                                            checks=knn_params['checks'])
         return indices
 
 def run():
-    td = TrainingData()
-    td.read("data/train.csv")
-    features = [td.node_attr_map[k] for k in sorted(td.node_attr_map.keys())]
+    tg = TrainingGraph()
+    features = [tg.td.node_attr_map[k] for k in sorted(tg.G.nodes())]
     ordered_features = []
     for f in features:
         ordered_features.append([f[fi] for fi in sorted(f, key=f.get)])
